@@ -100,7 +100,7 @@ build: ${BUILD_NUMBER}
 commit: ${GIT_COMMIT}
 branch: ${GIT_BRANCH}
 url: ${BUILD_URL}
-date: $(date +"%Y_%m_%d-%H:%M:%S")
+date: \$(date +"%Y_%m_%d-%H:%M:%S")
 EOF
                 """
             }
