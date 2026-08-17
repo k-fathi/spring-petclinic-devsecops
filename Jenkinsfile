@@ -24,14 +24,14 @@ pipeline{
             }
         }
         stage('Stage 2 - Testing & Scanning The Code Base & Dockerfile'){
-            agent{
-                docker{
-                    image 'aquasec/trivy'
-                    args '--entrypoint=""'
-                }
-            }
             parallel{
                 stage('SCA - pom.xml Scanning'){
+                    agent{
+                        docker{
+                            image 'aquasec/trivy'
+                            args '--entrypoint=""'
+                        }
+                    }
                     steps{
                         sh "echo ======>>> Trivy Generates the SBOM report sbom.json now..."
                         sh "trivy fs --format cyclonedx --output sbom.json ."
@@ -41,6 +41,12 @@ pipeline{
                     }
                 }
                 stage('IaC Dockerfile Scanning'){
+                    agent{
+                        docker{
+                            image 'aquasec/trivy'
+                            args '--entrypoint=""'
+                        }
+                    }
                     steps{
                         sh "echo ======>>> Trivy Scans the Dockerfile now..."
                         sh "trivy conf --severity CRITICAL,HIGH --exit-code 1 ./Dockerfile"
@@ -90,7 +96,7 @@ pipeline{
                     sh "docker build -t ${REPO}/${IMG}:${TAG} -t ${REPO}/${IMG}:latest ."
                   
                     sh "echo ======>>> Trivy Scanning the Image now..."
-                    sh "trivy image --severity HIGH,CRITICAL --exit-code 1 ${IMAGE}:${TAG}"
+                    sh "trivy image --severity HIGH,CRITICAL --exit-code 1 ${IMG}:${TAG}"
                   
                     sh "echo ======>>> Pushing the Images now..."
                     sh "docker push ${IMG}:${TAG}"
