@@ -12,7 +12,7 @@ pipeline{
     stages{
         stage('Stage 1 - Shallow Clonning The App'){
             steps{
-                sh "======>>> Shallow Clonning: echo Start Clonning the Last Commit Only..."
+                sh "echo ======>>> Shallow Clonning: Start Clonning the Last Commit Only..."
                 checkout scmGit(branches: [[name: 'main']],
                     extensions: [cloneOption(depth: 1,
                         noTags: false,
@@ -32,16 +32,16 @@ pipeline{
             parallel{
                 stage('SCA - pom.xml Scanning'){
                     steps{
-                        sh "======>>> echo Trivy Generates the SBOM report sbom.json now..."
+                        sh "echo ======>>> Trivy Generates the SBOM report sbom.json now..."
                         sh "trivy fs --format cyclonedx --output sbom.json ."
 
-                        sh "======>>> echo Trivy Scans the Dependinces now..."
+                        sh "echo ======>>> Trivy Scans the Dependinces now..."
                         sh "trivy fs --scanners vuln --severity CRITICAL,HIGH --exit-code 1 ."
                     }
                 }
                 stage('IaC Dockerfile Scanning'){
                     steps{
-                        sh "======>>> echo Trivy Scans the Dockerfile now..."
+                        sh "echo ======>>> Trivy Scans the Dockerfile now..."
                         sh "trivy conf --severity CRITICAL,HIGH --exit-code 1 ./Dockerfile"
                     }
                 }
@@ -55,7 +55,7 @@ pipeline{
                 }
             }
             steps{
-                sh "======>>> echo maven Starts Unit Tests, Integration Tests and Builds the Artifact now..."
+                sh "echo ======>>> maven Starts Unit Tests, Integration Tests and Builds the Artifact now..."
                 sh "mvn clean package"
             }
         }
@@ -68,7 +68,7 @@ pipeline{
             }
             steps{
                 withSonarQubeEnv('sonarqube-server') {
-                    sh "======>>> echo Sonar Clinet Plugin Collects the source code file + Unit, integration tests report and Sending them to SonarQube Server now..."
+                    sh "echo ======>>> Sonar Clinet Plugin Collects the source code file + Unit, integration tests report and Sending them to SonarQube Server now..."
                     sh '''
                     mvn sonar:sonar \
                     -Dsonar.projectKey=spring-petclinic \
@@ -82,20 +82,20 @@ pipeline{
         stage('Stage 5 - Building & Testing The Docker Image'){
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PWD', usernameVariable: 'DOCKERHUB_USER')]) {
-                    sh "======>>> echo Loggin to DockerHub now..."
+                    sh "echo ======>>> Loggin to DockerHub now..."
                     sh "echo "${DOCKERHUB_PWD}" | docker login -u ${DOCKERHUB_USER} --password-stdin"
                   
-                    sh "======>>> echo Building The Image now..."
+                    sh "echo ======>>> Building The Image now..."
                     sh "docker build -t ${REPO}/${IMG}:${TAG} -t ${REPO}/${IMG}:latest ."
                   
-                    sh "======>>> echo Trivy Scanning the Image now..."
+                    sh "echo ======>>> Trivy Scanning the Image now..."
                     sh "trivy image --severity HIGH,CRITICAL --exit-code 1 ${IMAGE}:${TAG}"
                   
-                    sh "======>>> echo Pushing thw Images now..."
+                    sh "echo ======>>> Pushing the Images now..."
                     sh "docker push ${IMG}:${TAG}"
                     sh "docker push ${IMG}:latest"
                 }
-                sh "======>>> echo Generating the deploy file now..."
+                sh "echo ======>>> Generating the deploy file now..."
                 sh """
                     cat > deploy-info-${BUILD_NUMBER}.txt <<EOF
 image: ${IMG}:${TAG}
@@ -117,29 +117,29 @@ EOF
             }
             steps{
 
-                sh "======>>> echo Removing any existing container with the same name..."
+                sh "echo ======>>> Removing any existing container with the same name..."
                 sh "docker rm -f ${CONTAINER_NAME} || true"
 
-                sh "======>>> echo Running the container..."
+                sh "echo ======>>> Running the container..."
                 sh "docker run -d --name ${CONTAINER_NAME} -p 8080:${APP_PORT} ${REPO}/${IMG}:${TAG}"
                 
-                sh "======>>> echo Running A Smoke Testing..."
+                sh "echo ======>>> Running A Smoke Testing..."
                 sh "docker network create pipeline-net"
                 sh "docker network connect ${CONTAINER_NAME} pipeline-net"
                 sh "sleep 10; curl -s -o /dev/null -w "%{http_code}" ${CONTAINER_NAME}:8080/actuator/healthcurl || false"
 
-                sh "======>>> echo Running DAST..."
+                sh "echo ======>>> Running DAST..."
                 sh 'zap-baseline.py -t http://petclinic-app:8080  -r zap-report.html -l MEDIUM,HIGHT'
             }
         }
     }
     post{
         success{
-            sh "echo "Pipeline completed successfully!""
+            sh "echo 'Pipeline completed successfully!'"
         }
         failure{
             sh 'echo "Pipeline failed!"'
-            sh "echo "======>>> echo Removing any existing container with the same name...""
+            sh "echo '======>>> echo Removing any existing container with the same name...'"
             sh "docker rmi -f ${REPO}/${IMG}:${TAG} || true"
             sh "docker rm -f ${CONTAINER_NAME} || true"
         }
