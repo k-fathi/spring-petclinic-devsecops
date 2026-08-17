@@ -135,13 +135,13 @@ EOF
     }
     post{
         success{
-            echo "Pipeline completed successfully!"
+            sh "echo "Pipeline completed successfully!""
         }
         failure{
-            echo "Pipeline failed!"
-            echo "======>>> echo Removing any existing container with the same name..."
-            docker rmi -f ${REPO}/${IMG}:${TAG} || true
-            docker rm -f ${CONTAINER_NAME} || true
+            sh "echo "Pipeline failed!""
+            sh "echo "======>>> echo Removing any existing container with the same name...""
+            sh "docker rmi -f ${REPO}/${IMG}:${TAG} || true"
+            sh "docker rm -f ${CONTAINER_NAME} || true"
         }
         always{
             archiveArtifacts artifacts: "deploy-info-${BUILD_NUMBER}.txt", followSymlinks: false
