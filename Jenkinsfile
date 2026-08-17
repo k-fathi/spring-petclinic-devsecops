@@ -82,7 +82,7 @@ pipeline{
                     -Dsonar.projectName=Spring Petclinic \
                     -Dsonar.host.url=http://sonarqube:9000 \
                     '''
-                    waitForQualityGate()
+                    waitForQualityGate(abortPipeline: true)
                 }
             }
         }
