@@ -1,4 +1,7 @@
 pipeline{
+    options{
+        skipDefaultCheckou()
+    }
     environment{
         REPO="karimfathi1"
         IMG="spring-petclinic"
