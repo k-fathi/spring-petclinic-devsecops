@@ -6,7 +6,7 @@ pipeline{
     environment{
         REPO="karimfathi1"
         IMG="spring-petclinic"
-        TAG=${BUILD_NUMBER}
+        TAG="${BUILD_NUMBER}"
         CONTAINER_NAME="spring-petclinc"
         APP_PORT="8080"
     }
