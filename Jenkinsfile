@@ -1,7 +1,7 @@
 pipeline{
     agent none
     options{
-        skipDefaultCheckou()
+        skipDefaultCheckout()
     }
     environment{
         REPO="karimfathi1"
