@@ -126,7 +126,8 @@ EOF
                 sh "echo ======>>> Running A Smoke Testing..."
                 sh "docker network create pipeline-net"
                 sh "docker network connect ${CONTAINER_NAME} pipeline-net"
-                sh "sleep 10; curl -s -o /dev/null -w "%{http_code}" ${CONTAINER_NAME}:8080/actuator/healthcurl || false"
+                sh "sleep 10"
+                sh "curl -s -o /dev/null -w \"%{http_code}\" ${CONTAINER_NAME}:8080/actuator/healthcurl || false"
 
                 sh "echo ======>>> Running DAST..."
                 sh 'zap-baseline.py -t http://petclinic-app:8080  -r zap-report.html -l MEDIUM,HIGHT'
