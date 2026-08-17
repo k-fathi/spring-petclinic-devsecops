@@ -138,7 +138,7 @@ EOF
             sh "echo "Pipeline completed successfully!""
         }
         failure{
-            sh "echo 'Pipeline failed!"'
+            sh 'echo "Pipeline failed!"'
             sh "echo "======>>> echo Removing any existing container with the same name...""
             sh "docker rmi -f ${REPO}/${IMG}:${TAG} || true"
             sh "docker rm -f ${CONTAINER_NAME} || true"
