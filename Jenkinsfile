@@ -12,6 +12,7 @@ pipeline{
     }
     stages{
         stage('Stage 1 - Shallow Clonning The App'){
+            node any
             steps{
                 sh "echo ======>>> Shallow Clonning: Start Clonning the Last Commit Only..."
                 checkout scmGit(branches: [[name: 'main']],
