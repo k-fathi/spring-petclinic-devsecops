@@ -83,7 +83,7 @@ pipeline{
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PWD', usernameVariable: 'DOCKERHUB_USER')]) {
                     sh "echo ======>>> Loggin to DockerHub now..."
-                    sh "echo "${DOCKERHUB_PWD}" | docker login -u ${DOCKERHUB_USER} --password-stdin"
+                    sh "echo \"${DOCKERHUB_PWD}\" | docker login -u ${DOCKERHUB_USER} --password-stdin"
                   
                     sh "echo ======>>> Building The Image now..."
                     sh "docker build -t ${REPO}/${IMG}:${TAG} -t ${REPO}/${IMG}:latest ."
