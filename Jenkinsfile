@@ -49,7 +49,7 @@ pipeline{
                         }
                     }
                     steps{
-                        sh 'echo Trivy Scan the SBOM report sbom.json (SCA)now...'
+                        sh "echo 'Trivy Scan the SBOM report sbom.json (SCA)now...'"
                         sh "trivy sbom target/sbom.json --severity CRITICAL,HIGH --exit-code 1"                
                     }
                 }
