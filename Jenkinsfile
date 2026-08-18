@@ -25,22 +25,20 @@ pipeline{
             }
         }
         stage('Stage 2 - Preparing Trivy For maven'){
-                agent {
-                    docker {
-                        image 'maven:3.9-eclipse-temurin-17'
-                        args "-v ${env.M2_CACHE}:/tmp/.m2 --entrypoint=\"\""
-                        reuseNode true
-                    }
-                }
-                environment {
-                    MAVEN_OPTS = "-Dmaven.repo.local=/tmp/.m2/repository"
-                }
-                steps{
-                    sh 'mvn clean compile -DskipTests'
-                    sh 'echo Generating CycloneDX SBOM via Maven now...'
-                    sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DoutputFormat=json -DoutputName=sbom'
+            agent {
+                docker {
+                    image 'maven:3.9-eclipse-temurin-17'
+                    args "-u root -v ${env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
+                    reuseNode true
                 }
             }
+
+            steps{
+                sh 'mvn clean compile -DskipTests'
+                sh 'echo Generating CycloneDX SBOM via Maven now...'
+                sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DoutputFormat=json -DoutputName=sbom'
+            }
+        }
         stage('Stage 3 - Testing & Scanning The Code Base & Dockerfile'){
             parallel{
                 stage('SBOM - SCA Scanning'){
@@ -76,11 +74,8 @@ pipeline{
             agent{
                 docker {
                     image 'maven:3.9-eclipse-temurin-17'
-                    args "-v ${env.M2_CACHE}:/tmp/.m2 --entrypoint=\"\""
+                    args "-u root -v ${env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
                 }
-            }
-            environment {
-                MAVEN_OPTS = "-Dmaven.repo.local=/tmp/.m2/repository"
             }            
             steps{
                 sh "echo maven Starts Unit Tests, Integration Tests and Builds the Artifact now..."
@@ -92,11 +87,11 @@ pipeline{
             agent {
                 docker {
                     image 'maven:3.9-eclipse-temurin-17'
-                    args "-v ${env.M2_CACHE}:/tmp/.m2 --entrypoint=\"\""
+                    args "-u root -v ${env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
                 }
             }
             environment {
-                MAVEN_OPTS = "-Dmaven.repo.local=/tmp/.m2/repository"
+                MAVEN_OPTS = "-Dmaven.repo.local=/root/.m2/repository"
             }
             steps{
                 withSonarQubeEnv('sonarqube-server') {
