@@ -27,7 +27,7 @@ pipeline{
         stage('Stage 2 - Preparing Trivy For maven'){
                 agent {
                     docker {
-                        image 'maven:eclipse-temurin:17-jdk'
+                        image 'maven:3.9-eclipse-temurin-17'
                         args '-v /var/jenkins_home/.m2:/root/.m2 --entrypoint=""'
                     }
                 }
@@ -74,7 +74,7 @@ pipeline{
         stage('Stage 4 - Testing The App - Unit & Integration Tests'){
             agent{
                 docker {
-                    image 'maven:eclipse-temurin:17-jdk'
+                    image 'maven:3.9-eclipse-temurin-17'
                     args '-v /var/jenkins_home/.m2:/root/.m2 --entrypoint=""'
                 }
             }
@@ -87,7 +87,7 @@ pipeline{
         stage('Stage 5 - Building & Scanning The App'){
             agent {
                 docker {
-                    image 'maven:eclipse-temurin:17-jdk'
+                    image 'maven:3.9-eclipse-temurin-17'
                     args '-v /var/jenkins_home/.m2:/root/.m2 --entrypoint=""'
                 }
             }
