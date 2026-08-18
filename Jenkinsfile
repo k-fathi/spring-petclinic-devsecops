@@ -93,7 +93,7 @@ pipeline{
             agent {
                 docker {
                     image 'maven:3.9-eclipse-temurin-17'
-                    args "-u root -v ${env.M2_CACHE}:/root/.m2 --entrypoint=\"\" --network pipeline-net"
+                    args "-u root -v ${env.M2_CACHE}:/root/.m2 --entrypoint=\"\" --network devops-net"
                     reuseNode true
                 }
             }
