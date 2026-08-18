@@ -41,7 +41,7 @@ pipeline{
                     agent{
                         docker{
                             image 'aquasec/trivy'
-                            args '-v /var/jenkins_home/.m2:/root/.m2 -v ${WORKSPACE}/:/app --entrypoint=""'
+                            args "-v /var/jenkins_home/.m2:/root/.m2 -v ${WORKSPACE}/:/app --entrypoint=\"\""
                         }
                     }
                     steps{
