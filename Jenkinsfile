@@ -110,8 +110,17 @@ pipeline{
                     -Dsonar.coverage.jacoco.xmlReportPath=target/site/jacoco/jacoco.xml
                     '''
                     // the last parameter is to notify sonar blugin with the location of the jacoco report, so it can calculate the code coverage and send it to sonar server
-                    sh "echo  Waiting for SonarQube Quality Gate result now..."
-                    waitForQualityGate(abortPipeline: true)
+                }
+            }
+        }
+        stage('Stage 5.1 - Quality Gate Check'){
+            agent any
+            steps{
+                script {
+                    timeout(time: 1, unit: 'HOURS') {
+                        sh "echo  Waiting for SonarQube Quality Gate result now..."
+                        waitForQualityGate(abortPipeline: true)
+                    }
                 }
             }
         }
