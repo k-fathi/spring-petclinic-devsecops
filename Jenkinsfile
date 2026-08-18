@@ -32,7 +32,7 @@ pipeline{
                     }
                 }
                 steps{
-                    sh 'mvn dependency:resolve'
+                    sh 'mvn dependency:go-offline'
                 }
             }
         stage('Stage 3 - Testing & Scanning The Code Base & Dockerfile'){
