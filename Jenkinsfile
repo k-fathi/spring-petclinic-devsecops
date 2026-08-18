@@ -94,6 +94,7 @@ pipeline{
                 docker {
                     image 'maven:3.9-eclipse-temurin-17'
                     args "-u root -v ${env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
+                    reuseNode true
                 }
             }
             environment {
