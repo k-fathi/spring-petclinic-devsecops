@@ -144,7 +144,7 @@ pipeline{
                     sh "docker build -t ${REPO}/${IMG}:${TAG} -t ${REPO}/${IMG}:latest ."
                   
                     sh "echo  Trivy Scanning the Image now..."
-                    sh "trivy image --severity HIGH,CRITICAL --exit-code 1 $${REPO}/${IMG}:${TAG}"
+                    sh "trivy image --severity HIGH,CRITICAL --exit-code 1 ${REPO}/${IMG}:${TAG}"
                   
                     sh "echo  Pushing the Images now..."
                     sh "docker push ${REPO}/${IMG}:${TAG}"
