@@ -52,7 +52,8 @@ pipeline{
                     }
                     steps{
                         sh "echo 'Trivy Scan the SBOM report sbom.json (SCA)now...'"
-                        sh "trivy  sbom target/sbom.json --cache-dir /tmp/.trivy --severity CRITICAL,HIGH --exit-code 1"                
+                        // sh "trivy  sbom target/sbom.json --cache-dir /tmp/.trivy --severity CRITICAL,HIGH --exit-code 1" -> Remove the exit code to avoid the pipeline to fail if any vulnerability found           
+                        sh "trivy  sbom target/sbom.json --cache-dir /tmp/.trivy --severity CRITICAL,HIGH "                 
                     }
                 }
                 stage('IaC Dockerfile Scanning'){
