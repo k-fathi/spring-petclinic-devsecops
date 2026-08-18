@@ -174,7 +174,7 @@ EOF
                 sh "docker rm -f ${CONTAINER_NAME} || true"
 
                 sh "echo  Running the container..."
-                sh "docker run -d --name ${CONTAINER_NAME} --network pipeline-net -p 8080:${APP_PORT} ${REPO}/${IMG}:${TAG}"
+                sh "docker run -d --name ${CONTAINER_NAME} --network pipeline-net -p 8888:${APP_PORT} ${REPO}/${IMG}:${TAG}"
                 
                 sh "echo Connecting container to devops-net..."
                 sh "docker network connect devops-net ${CONTAINER_NAME} || true"
