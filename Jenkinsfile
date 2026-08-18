@@ -25,32 +25,48 @@ pipeline{
             }
         }
         stage('Stage 2 - Testing & Scanning The Code Base & Dockerfile'){
+            stage('Preparing Trivy For maven'){
+                agent {
+                    docker {
+                        image 'maven:eclipse-temurin:17-jdk'
+                        args '-v /var/jenkins_home/.m2:/root/.m2 --entrypoint=""'
+                    }
+                }
+                steps{
+                    sh 'mvn dependency:resolve'
+                }
+            }
             parallel{
                 stage('SCA - pom.xml Scanning'){
                     agent{
                         docker{
                             image 'aquasec/trivy'
-                            args '--entrypoint=""'
+                            args '-v /var/jenkins_home/.m2:/root/.m2 -v ${WORKSPACE}/:/app --entrypoint=""'
                         }
                     }
                     steps{
-                        sh "echo  Trivy Generates the SBOM report sbom.json now..."
-                        sh "trivy fs --format cyclonedx --output sbom.json ."
-
-                        sh "echo  Trivy Scans the Dependinces now..."
-                        sh "trivy fs --scanners vuln --severity CRITICAL,HIGH --exit-code 1 ."
+                        dir('/app'){
+                            sh "echo  Trivy Generates the SBOM report sbom.json now..."
+                            sh "trivy fs --format cyclonedx --output sbom.json ."
+                            
+                            sh "echo  Trivy Scans the Dependinces (SCA) now..."
+                            sh "trivy fs --scanners vuln --severity CRITICAL,HIGH --exit-code 1 ."
+                        }
+                       
                     }
                 }
                 stage('IaC Dockerfile Scanning'){
                     agent{
                         docker{
                             image 'aquasec/trivy'
-                            args '--entrypoint=""'
+                            args '-v ${WORKSPACE}/:/app --entrypoint=""'
                         }
                     }
                     steps{
-                        sh "echo  Trivy Scans the Dockerfile now..."
-                        sh "trivy conf --severity CRITICAL,HIGH --exit-code 1 ./Dockerfile"
+                        dir('/app'){
+                            sh "echo  Trivy Scans the Dockerfile now..."
+                            sh "trivy conf --severity CRITICAL,HIGH --exit-code 1 ./Dockerfile"
+                        }
                     }
                 }
             }
@@ -63,10 +79,11 @@ pipeline{
                 }
             }
             steps{
-                sh "echo  maven Starts Unit Tests, Integration Tests and Builds the Artifact now..."
+                sh "echo maven Starts Unit Tests, Integration Tests and Builds the Artifact now..."
                 sh "mvn clean package"
             }
         }
+        
         stage('Stage 4 - Building & Scanning The App'){
             agent {
                 docker {
