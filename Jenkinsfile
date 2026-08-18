@@ -169,13 +169,12 @@ EOF
             steps{
 
                 sh "docker network create pipeline-net"
-                sh "docker network connect ${CONTAINER_NAME} pipeline-net"
 
                 sh "echo  Removing any existing container with the same name..."
                 sh "docker rm -f ${CONTAINER_NAME} || true"
 
                 sh "echo  Running the container..."
-                sh "docker run -d --name ${CONTAINER_NAME} -p 8080:${APP_PORT} ${REPO}/${IMG}:${TAG}"
+                sh "docker run -d --name ${CONTAINER_NAME} --network pipeline-net --network devops-net -p 8080:${APP_PORT} ${REPO}/${IMG}:${TAG}"
                 
                 sh "echo  Running A Smoke Testing..."
                 sh "sleep 10"
