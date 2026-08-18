@@ -66,7 +66,7 @@ pipeline{
                     }
                     steps{
                         sh "echo  Trivy Scans the Dockerfile now..."
-                        sh "trivy conf --severity CRITICAL,HIGH --exit-code 1 ./Dockerfile"
+                        sh "trivy conf --severity CRITICAL,HIGH --exit-code 1 --cache-dir /tmp/.trivy ./Dockerfile"
                     }
                 }
             }
