@@ -101,6 +101,8 @@ pipeline{
                 MAVEN_OPTS = "-Dmaven.repo.local=/root/.m2/repository"
             }
             steps{
+                sh 'mvn clean package -DskipTests' // just to get the jar file, as the previuos stage failed to get us the unit &integration tests file
+                // now we need only the artifact  
                 withSonarQubeEnv('sonarqube-server') {
                     sh "echo  Sonar Clinet Plugin Collects the source code file + Unit, integration tests report and Sending them to SonarQube Server now..."
                     sh '''
@@ -113,6 +115,7 @@ pipeline{
                 }
             }
         }
+
         stage('Stage 5.1 - Quality Gate Check'){
             agent any
             steps{
