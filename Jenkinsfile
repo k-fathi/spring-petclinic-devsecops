@@ -59,7 +59,7 @@ pipeline{
                     agent{
                         docker{
                             image 'aquasec/trivy'
-                            args '-v ${WORKSPACE}/:/app --entrypoint=""'
+                            args "-v ${WORKSPACE}/:/app --entrypoint=\"\""
                         }
                     }
                     steps{
