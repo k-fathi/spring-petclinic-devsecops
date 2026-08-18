@@ -107,8 +107,10 @@ pipeline{
                     mvn sonar:sonar \
                     -Dsonar.projectKey=spring-petclinic \
                     -Dsonar.projectName="Spring Petclinic" \
-                    -Dsonar.host.url=http://sonarqube:9000 \
+                    -Dsonar.coverage.jacoco.xmlReportPath=target/site/jacoco/jacoco.xml
                     '''
+                    // the last parameter is to notify sonar blugin with the location of the jacoco report, so it can calculate the code coverage and send it to sonar server
+                    sh "echo  Waiting for SonarQube Quality Gate result now..."
                     waitForQualityGate(abortPipeline: true)
                 }
             }
