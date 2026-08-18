@@ -166,13 +166,10 @@ EOF
             }
         }
         stage('Stage 7 - Deploying & Testing The Running App'){
-            agent {
-                docker {
-                    image "zaproxy/zap-stable"
-                    args '--network pipeline-net --entrypoint=""' 
-                }
-            }
             steps{
+
+                sh "docker network create pipeline-net"
+                sh "docker network connect ${CONTAINER_NAME} pipeline-net"
 
                 sh "echo  Removing any existing container with the same name..."
                 sh "docker rm -f ${CONTAINER_NAME} || true"
@@ -181,13 +178,19 @@ EOF
                 sh "docker run -d --name ${CONTAINER_NAME} -p 8080:${APP_PORT} ${REPO}/${IMG}:${TAG}"
                 
                 sh "echo  Running A Smoke Testing..."
-                sh "docker network create pipeline-net"
-                sh "docker network connect ${CONTAINER_NAME} pipeline-net"
                 sh "sleep 10"
                 sh "curl -s -o /dev/null -w \"%{http_code}\" ${CONTAINER_NAME}:8080/actuator/health || false"
 
                 sh "echo  Running DAST..."
-                sh 'zap-baseline.py -t http://petclinic-app:8080  -r zap-report.html -l MEDIUM,HIGH'
+                sh "echo Running DAST..."
+                sh """
+                docker run --rm --network pipeline-net \
+                zaproxy/zap-stable \
+                zap-baseline.py \
+                -t http://${CONTAINER_NAME}:8080 \
+                -r zap-report.html \
+                -l MEDIUM,HIGH
+                """
             }
         }
     }
