@@ -168,19 +168,21 @@ EOF
         stage('Stage 7 - Deploying & Testing The Running App'){
             steps{
 
-                sh "docker network create pipeline-net"
+                sh "docker network create pipeline-net || true"
 
                 sh "echo  Removing any existing container with the same name..."
                 sh "docker rm -f ${CONTAINER_NAME} || true"
 
                 sh "echo  Running the container..."
-                sh "docker run -d --name ${CONTAINER_NAME} --network pipeline-net --network devops-net -p 8080:${APP_PORT} ${REPO}/${IMG}:${TAG}"
+                sh "docker run -d --name ${CONTAINER_NAME} --network pipeline-net -p 8080:${APP_PORT} ${REPO}/${IMG}:${TAG}"
                 
+                sh "echo Connecting container to devops-net..."
+                sh "docker network connect devops-net ${CONTAINER_NAME} || true"
+
                 sh "echo  Running A Smoke Testing..."
                 sh "sleep 10"
-                sh "curl -s -o /dev/null -w \"%{http_code}\" ${CONTAINER_NAME}:8080/actuator/health || false"
+                sh "curl -s -o /dev/null -w \"%{http_code}\" http://${CONTAINER_NAME}:8080/actuator/health || false"
 
-                sh "echo  Running DAST..."
                 sh "echo Running DAST..."
                 sh """
                 docker run --rm --network pipeline-net \
