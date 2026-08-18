@@ -41,32 +41,28 @@ pipeline{
                     agent{
                         docker{
                             image 'aquasec/trivy'
-                            args "-v /var/jenkins_home/.m2:/root/.m2 -v ${WORKSPACE}/:/app --entrypoint=\"\""
+                            args '-v /var/jenkins_home/.m2:/root/.m2  --entrypoint=""'
                         }
                     }
                     steps{
-                        dir('/app'){
-                            sh "echo  Trivy Generates the SBOM report sbom.json now..."
-                            sh "trivy fs --format cyclonedx --output sbom.json ."
-                            
-                            sh "echo  Trivy Scans the Dependinces (SCA) now..."
-                            sh "trivy fs --scanners vuln --severity CRITICAL,HIGH --exit-code 1 ."
-                        }
-                       
+                        sh "echo  Trivy Generates the SBOM report sbom.json now..."
+                        sh "trivy fs --format cyclonedx --output sbom.json ."
+                        
+                        sh "echo  Trivy Scans the Dependinces (SCA) now..."
+                        sh "trivy fs --scanners vuln --severity CRITICAL,HIGH --exit-code 1 ."                       
                     }
                 }
                 stage('IaC Dockerfile Scanning'){
                     agent{
                         docker{
                             image 'aquasec/trivy'
-                            args "-v ${WORKSPACE}/:/app --entrypoint=\"\""
+                            // args "-v ${.env.WORKSPACE}/:/app --entrypoint=\"\"" Jenkins automaticlly mount the WORKSPACE Dir into the container and change the directory to workspace, so no need to mount it again
+                            args '--entrypoint=\"\"'
                         }
                     }
                     steps{
-                        dir('/app'){
-                            sh "echo  Trivy Scans the Dockerfile now..."
-                            sh "trivy conf --severity CRITICAL,HIGH --exit-code 1 ./Dockerfile"
-                        }
+                        sh "echo  Trivy Scans the Dockerfile now..."
+                        sh "trivy conf --severity CRITICAL,HIGH --exit-code 1 ./Dockerfile"
                     }
                 }
             }
