@@ -10,6 +10,7 @@ pipeline{
         CONTAINER_NAME="spring-petclinc"
         APP_PORT="8080"
         M2_CACHE="maven-repo-cache"
+        TRIVY_CACHE = "trivy-db-cache"
     }
     stages{
         stage('Stage 1 - Shallow Clonning The App'){
@@ -45,13 +46,13 @@ pipeline{
                     agent{
                         docker{
                             image 'aquasec/trivy'
-                            args '--entrypoint=""'
+                            args "-v ${env.TRIVY_CACHE}:/tmp/.trivy --entrypoint=\"\""
                             reuseNode true
                         }
                     }
                     steps{
                         sh "echo 'Trivy Scan the SBOM report sbom.json (SCA)now...'"
-                        sh "trivy sbom target/sbom.json --severity CRITICAL,HIGH --exit-code 1"                
+                        sh "trivy  sbom target/sbom.json --cache-dir /tmp/.trivy --severity CRITICAL,HIGH --exit-code 1"                
                     }
                 }
                 stage('IaC Dockerfile Scanning'){
@@ -59,7 +60,7 @@ pipeline{
                         docker{
                             image 'aquasec/trivy'
                             // args "-v ${.env.WORKSPACE}/:/app --entrypoint=\"\"" Jenkins automaticlly mount the WORKSPACE Dir into the container and change the directory to workspace, so no need to mount it again
-                            args '--entrypoint=""'
+                            args "-v ${env.TRIVY_CACHE}:/tmp/.trivy --entrypoint=\"\""
                             reuseNode true
                         }
                     }
