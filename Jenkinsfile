@@ -24,8 +24,7 @@ pipeline{
                         url: 'https://github.com/k-fathi/spring-petclinic-devsecops.git']])
             }
         }
-        stage('Stage 2 - Testing & Scanning The Code Base & Dockerfile'){
-            stage('Preparing Trivy For maven'){
+        stage('Stage 2 - Preparing Trivy For maven'){
                 agent {
                     docker {
                         image 'maven:eclipse-temurin:17-jdk'
@@ -36,6 +35,7 @@ pipeline{
                     sh 'mvn dependency:resolve'
                 }
             }
+        stage('Stage 3 - Testing & Scanning The Code Base & Dockerfile'){
             parallel{
                 stage('SCA - pom.xml Scanning'){
                     agent{
@@ -71,7 +71,7 @@ pipeline{
                 }
             }
         }
-        stage('Stage 3 - Testing The App - Unit & Integration Tests'){
+        stage('Stage 4 - Testing The App - Unit & Integration Tests'){
             agent{
                 docker {
                     image 'maven:eclipse-temurin:17-jdk'
@@ -83,8 +83,8 @@ pipeline{
                 sh "mvn clean package"
             }
         }
-        
-        stage('Stage 4 - Building & Scanning The App'){
+
+        stage('Stage 5 - Building & Scanning The App'){
             agent {
                 docker {
                     image 'maven:eclipse-temurin:17-jdk'
@@ -104,7 +104,7 @@ pipeline{
                 }
             }
         }
-        stage('Stage 5 - Building & Testing The Docker Image'){
+        stage('Stage 6 - Building & Testing The Docker Image'){
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PWD', usernameVariable: 'DOCKERHUB_USER')]) {
                     sh "echo  Loggin to DockerHub now..."
@@ -133,7 +133,7 @@ EOF
                 """
             }
         }
-        stage('Stage 6 - Deploying & Testing The Running App'){
+        stage('Stage 7 - Deploying & Testing The Running App'){
             agent {
                 docker {
                     image "zaproxy/zap-stable"
