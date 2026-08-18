@@ -32,7 +32,7 @@ pipeline{
                     }
                 }
                 steps{
-                    sh 'mvn dependency:go-offline'
+                    sh 'mvn clean compile -DskipTests'
                 }
             }
         stage('Stage 3 - Testing & Scanning The Code Base & Dockerfile'){
