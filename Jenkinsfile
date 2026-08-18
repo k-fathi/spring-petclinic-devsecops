@@ -46,7 +46,7 @@ pipeline{
                     agent{
                         docker{
                             image 'aquasec/trivy'
-                            args "-v ${env.TRIVY_CACHE}:/tmp/.trivy --entrypoint=\"\""
+                            args "-u root -v ${env.TRIVY_CACHE}:/tmp/.trivy --entrypoint=\"\""
                             reuseNode true
                         }
                     }
@@ -60,7 +60,7 @@ pipeline{
                         docker{
                             image 'aquasec/trivy'
                             // args "-v ${.env.WORKSPACE}/:/app --entrypoint=\"\"" Jenkins automaticlly mount the WORKSPACE Dir into the container and change the directory to workspace, so no need to mount it again
-                            args "-v ${env.TRIVY_CACHE}:/tmp/.trivy --entrypoint=\"\""
+                            args "-u root -v ${env.TRIVY_CACHE}:/tmp/.trivy --entrypoint=\"\""
                             reuseNode true
                         }
                     }
