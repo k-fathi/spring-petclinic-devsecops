@@ -128,6 +128,13 @@ pipeline{
             }
         }
         stage('Stage 6 - Building & Testing The Docker Image'){
+            agent{
+                docker {
+                    image 'aquasec/trivy'
+                    args "-u root -v ${env.TRIVY_CACHE}:/tmp/.trivy -v /var/run/docker.sock:/var/run/docker.sock --entrypoint=\"\""
+                    reuseNode true
+                }
+            }
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PWD', usernameVariable: 'DOCKERHUB_USER')]) {
                     sh "echo  Loggin to DockerHub now..."
@@ -137,16 +144,16 @@ pipeline{
                     sh "docker build -t ${REPO}/${IMG}:${TAG} -t ${REPO}/${IMG}:latest ."
                   
                     sh "echo  Trivy Scanning the Image now..."
-                    sh "trivy image --severity HIGH,CRITICAL --exit-code 1 ${IMG}:${TAG}"
+                    sh "trivy image --severity HIGH,CRITICAL --exit-code 1 $${REPO}/${IMG}:${TAG}"
                   
                     sh "echo  Pushing the Images now..."
-                    sh "docker push ${IMG}:${TAG}"
-                    sh "docker push ${IMG}:latest"
+                    sh "docker push ${REPO}/${IMG}:${TAG}"
+                    sh "docker push ${REPO}/${IMG}:latest"
                 }
                 sh "echo  Generating the deploy file now..."
                 sh """
                     cat > deploy-info-${BUILD_NUMBER}.txt <<EOF
-image: ${IMG}:${TAG}
+image: ${REPO}/${IMG}:${TAG}
 build: ${BUILD_NUMBER}
 commit: ${GIT_COMMIT}
 branch: ${GIT_BRANCH}
