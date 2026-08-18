@@ -73,7 +73,7 @@ pipeline{
             agent{
                 docker {
                     image 'maven:3.9-eclipse-temurin-17'
-                    args "-v ${.env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
+                    args "-v ${env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
                 }
             }
             steps{
