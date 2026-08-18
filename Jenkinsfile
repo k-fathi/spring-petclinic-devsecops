@@ -9,6 +9,7 @@ pipeline{
         TAG="${BUILD_NUMBER}"
         CONTAINER_NAME="spring-petclinc"
         APP_PORT="8080"
+        M2_CACHE="maven-repo-cache"
     }
     stages{
         stage('Stage 1 - Shallow Clonning The App'){
@@ -57,7 +58,7 @@ pipeline{
                         docker{
                             image 'aquasec/trivy'
                             // args "-v ${.env.WORKSPACE}/:/app --entrypoint=\"\"" Jenkins automaticlly mount the WORKSPACE Dir into the container and change the directory to workspace, so no need to mount it again
-                            args '--entrypoint=\"\"'
+                            args '--entrypoint=""'
                             reuseNode true
                         }
                     }
@@ -72,7 +73,7 @@ pipeline{
             agent{
                 docker {
                     image 'maven:3.9-eclipse-temurin-17'
-                    args '-v /var/jenkins_home/.m2:/root/.m2 --entrypoint=""'
+                    args "-v ${.env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
                 }
             }
             steps{
@@ -85,7 +86,7 @@ pipeline{
             agent {
                 docker {
                     image 'maven:3.9-eclipse-temurin-17'
-                    args '-v /var/jenkins_home/.m2:/root/.m2 --entrypoint=""'
+                    args "-v ${.env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
                 }
             }
             steps{
