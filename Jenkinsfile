@@ -28,9 +28,12 @@ pipeline{
                 agent {
                     docker {
                         image 'maven:3.9-eclipse-temurin-17'
-                        args "-v ${env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
+                        args "-v ${env.M2_CACHE}:/tmp/.m2 --entrypoint=\"\""
                         reuseNode true
                     }
+                }
+                environment {
+                    MAVEN_OPTS = "-Dmaven.repo.local=/tmp/.m2/repository"
                 }
                 steps{
                     sh 'mvn clean compile -DskipTests'
@@ -73,9 +76,12 @@ pipeline{
             agent{
                 docker {
                     image 'maven:3.9-eclipse-temurin-17'
-                    args "-v ${env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
+                    args "-v ${env.M2_CACHE}:/tmp/.m2 --entrypoint=\"\""
                 }
             }
+            environment {
+                MAVEN_OPTS = "-Dmaven.repo.local=/tmp/.m2/repository"
+            }            
             steps{
                 sh "echo maven Starts Unit Tests, Integration Tests and Builds the Artifact now..."
                 sh "mvn clean package"
@@ -86,8 +92,11 @@ pipeline{
             agent {
                 docker {
                     image 'maven:3.9-eclipse-temurin-17'
-                    args "-v ${env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
+                    args "-v ${env.M2_CACHE}:/tmp/.m2 --entrypoint=\"\""
                 }
+            }
+            environment {
+                MAVEN_OPTS = "-Dmaven.repo.local=/tmp/.m2/repository"
             }
             steps{
                 withSonarQubeEnv('sonarqube-server') {
