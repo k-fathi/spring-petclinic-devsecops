@@ -82,7 +82,7 @@ pipeline{
             }            
             steps{
                 sh "echo maven Starts Unit Tests, Integration Tests and Builds the Artifact now..."
-                sh "mvn clean package"
+                sh "mvn clean package -e"
             }
         }
 
