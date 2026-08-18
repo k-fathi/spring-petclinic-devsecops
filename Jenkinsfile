@@ -27,30 +27,29 @@ pipeline{
                 agent {
                     docker {
                         image 'maven:3.9-eclipse-temurin-17'
-                        args '-v /var/jenkins_home/.m2:/root/.m2 --entrypoint=""'
+                        args "-v ${.env.M2_CACHE}:/root/.m2 --entrypoint=\"\""
                         reuseNode true
                     }
                 }
                 steps{
                     sh 'mvn clean compile -DskipTests'
+                    sh 'sh "echo Generating CycloneDX SBOM via Maven now..."'
+                    sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DoutputFormat=json -DoutputName=sbom'
                 }
             }
         stage('Stage 3 - Testing & Scanning The Code Base & Dockerfile'){
             parallel{
-                stage('SCA - pom.xml Scanning'){
+                stage('SBOM - SCA Scanning'){
                     agent{
                         docker{
                             image 'aquasec/trivy'
-                            args '-v /var/jenkins_home/.m2:/root/.m2  --entrypoint=""'
+                            args '--entrypoint=""'
                             reuseNode true
                         }
                     }
                     steps{
-                        sh "echo  Trivy Generates the SBOM report sbom.json now..."
-                        sh "trivy fs --format cyclonedx --output sbom.json ."
-                        
-                        sh "echo  Trivy Scans the Dependinces (SCA) now..."
-                        sh "trivy fs --scanners vuln --severity CRITICAL,HIGH --exit-code 1 ."                       
+                        sh "echo Trivy Scan the SBOM report sbom.json (SCA)now..."
+                        sh "trivy sbom target/sbom.json --severity CRITICAL,HIGH --exit-code 1"                
                     }
                 }
                 stage('IaC Dockerfile Scanning'){
