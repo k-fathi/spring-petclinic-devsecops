@@ -37,6 +37,7 @@ pipeline{
             steps{
                 sh 'mvn clean compile -DskipTests'
                 sh 'echo Generating CycloneDX SBOM via Maven now...'
+                // Generate the SBOM in JSON format and save it as sbom.json
                 sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DoutputFormat=json -DoutputName=sbom'
             }
         }
