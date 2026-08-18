@@ -28,7 +28,7 @@ pipeline{
                     docker {
                         image 'maven:3.9-eclipse-temurin-17'
                         args '-v /var/jenkins_home/.m2:/root/.m2 --entrypoint=""'
-                        reusedNode true
+                        reuseNode true
                     }
                 }
                 steps{
@@ -42,7 +42,7 @@ pipeline{
                         docker{
                             image 'aquasec/trivy'
                             args '-v /var/jenkins_home/.m2:/root/.m2  --entrypoint=""'
-                            reusedNode true
+                            reuseNode true
                         }
                     }
                     steps{
@@ -59,7 +59,7 @@ pipeline{
                             image 'aquasec/trivy'
                             // args "-v ${.env.WORKSPACE}/:/app --entrypoint=\"\"" Jenkins automaticlly mount the WORKSPACE Dir into the container and change the directory to workspace, so no need to mount it again
                             args '--entrypoint=\"\"'
-                            reusedNode true
+                            reuseNode true
                         }
                     }
                     steps{
