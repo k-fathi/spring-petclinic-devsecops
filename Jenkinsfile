@@ -1,5 +1,5 @@
 pipeline{
-    agent none
+    agent any
     options{
         skipDefaultCheckout()
     }
@@ -12,7 +12,6 @@ pipeline{
     }
     stages{
         stage('Stage 1 - Shallow Clonning The App'){
-            agent any
             steps{
                 sh "echo  Shallow Clonning: Start Clonning the Last Commit Only..."
                 checkout scmGit(branches: [[name: 'main']],
@@ -29,6 +28,7 @@ pipeline{
                     docker {
                         image 'maven:3.9-eclipse-temurin-17'
                         args '-v /var/jenkins_home/.m2:/root/.m2 --entrypoint=""'
+                        reusedNode true
                     }
                 }
                 steps{
@@ -42,6 +42,7 @@ pipeline{
                         docker{
                             image 'aquasec/trivy'
                             args '-v /var/jenkins_home/.m2:/root/.m2  --entrypoint=""'
+                            reusedNode true
                         }
                     }
                     steps{
@@ -58,6 +59,7 @@ pipeline{
                             image 'aquasec/trivy'
                             // args "-v ${.env.WORKSPACE}/:/app --entrypoint=\"\"" Jenkins automaticlly mount the WORKSPACE Dir into the container and change the directory to workspace, so no need to mount it again
                             args '--entrypoint=\"\"'
+                            reusedNode true
                         }
                     }
                     steps{
