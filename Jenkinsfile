@@ -89,7 +89,7 @@ pipeline{
             }
         }
 
-        stage('Stage 5 - Building & Scanning The App'){
+        stage('Stage 5 - Building & SAST - Scanning The App'){
             agent {
                 docker {
                     image 'maven:3.9-eclipse-temurin-17'
@@ -106,7 +106,7 @@ pipeline{
                     sh '''
                     mvn sonar:sonar \
                     -Dsonar.projectKey=spring-petclinic \
-                    -Dsonar.projectName=Spring Petclinic \
+                    -Dsonar.projectName="Spring Petclinic" \
                     -Dsonar.host.url=http://sonarqube:9000 \
                     '''
                     waitForQualityGate(abortPipeline: true)
