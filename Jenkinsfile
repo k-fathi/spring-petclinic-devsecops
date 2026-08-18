@@ -181,14 +181,14 @@ EOF
 
                 sh "echo  Running A Smoke Testing..."
                 sh "sleep 10"
-                sh "curl -s -o /dev/null -w \"%{http_code}\" http://${CONTAINER_NAME}:8080/actuator/health || false"
+                sh "curl -s -o /dev/null -w \"%{http_code}\" http://${CONTAINER_NAME}:8888/actuator/health || false"
 
                 sh "echo Running DAST..."
                 sh """
                 docker run --rm --network pipeline-net \
                 zaproxy/zap-stable \
                 zap-baseline.py \
-                -t http://${CONTAINER_NAME}:8080 \
+                -t http://${CONTAINER_NAME}:8888 \
                 -r zap-report.html \
                 -l MEDIUM,HIGH
                 """
