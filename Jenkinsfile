@@ -157,8 +157,8 @@ pipeline{
                     cat > deploy-info-${BUILD_NUMBER}.txt <<EOF
 image: ${REPO}/${IMG}:${TAG}
 build: ${BUILD_NUMBER}
-commit: ${env.GIT_COMMIT}
-branch: ${env.GIT_BRANCH}
+commit: ${GIT_COMMIT}
+branch: ${GIT_BRANCH}
 url: ${env.BUILD_URL}
 date: \$(date +"%Y_%m_%d-%H:%M:%S")
 EOF
