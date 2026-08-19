@@ -208,7 +208,7 @@ EOF
         }
         always{
             archiveArtifacts artifacts: "deploy-info-${BUILD_NUMBER}.txt", followSymlinks: false
-            archiveArtifacts artifacts: 'sbom.json', followSymlinks: false
+            archiveArtifacts artifacts: 'target/sbom.json', followSymlinks: false
             archiveArtifacts artifacts: 'zap-report.html', followSymlinks: false
             
             echo "Cleaning Workspace..."
